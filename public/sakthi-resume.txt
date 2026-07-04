@@ -5,4 +5,4 @@ Replace it with your PDF résumé at public/sakthi-resume.pdf and update the lin
 
 Focus: Full-stack web development
 Core stack: JSP, React, Next.js, TypeScript, Spring Boot, Microservices, PostgreSQL
-Contact: hello@sakthi.dev
+Contact: Sakth.Sub@gmail.com

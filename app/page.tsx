@@ -84,6 +84,17 @@ const projects = [
   },
 ];
 
+const navItems = [
+  { label: "Home", id: "home" },
+  { label: "About", id: "about" },
+  { label: "Projects", id: "projects" },
+  { label: "Skills", id: "skills" },
+  { label: "Clients", id: "clients" },
+  { label: "Contact", id: "contact" },
+] as const;
+
+type SectionId = (typeof navItems)[number]["id"];
+
 const skillGroups = [
   {
     title: "Frontend",
@@ -98,8 +109,24 @@ const skillGroups = [
   {
     title: "Tools",
     index: "03",
-    skills: ["Git & GitHub", "Docker", "CI / CD"],
+    skills: ["Git & GitHub", "Docker", "CI / CD", "OpenAI Codex — Familiar"],
   },
+];
+
+type Client = {
+  number: string;
+  name: string;
+  location: string;
+  applications: string[];
+};
+
+const clients: Client[] = [
+  { number: "01", name: "Emirates NBD", location: "Dubai", applications: ["Finacle"] },
+  { number: "02", name: "National Bank of Kenya", location: "Kenya", applications: ["Finacle"] },
+  { number: "03", name: "State Bank of Mauritius", location: "Mauritius", applications: ["Finacle", "CRM"] },
+  { number: "04", name: "Bank South Pacific", location: "Papua New Guinea", applications: ["Finacle", "CRM"] },
+  { number: "05", name: "ICICI Bank", location: "India", applications: ["Finacle"] },
+  { number: "06", name: "Lloyds Bank", location: "India", applications: ["Flexcube", "OFSAA"] },
 ];
 
 function MountainScene() {
@@ -188,6 +215,7 @@ function CodeWindow() {
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [light, setLight] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionId>("home");
 
   useEffect(() => {
     const stored = window.localStorage.getItem("portfolio-theme");
@@ -199,6 +227,49 @@ export default function Home() {
     window.localStorage.setItem("portfolio-theme", light ? "light" : "dark");
   }, [light]);
 
+  useEffect(() => {
+    let animationFrame: number | null = null;
+
+    const updateActiveSection = () => {
+      const header = document.querySelector<HTMLElement>(".site-header");
+      const activationPoint = window.scrollY + (header?.offsetHeight ?? 72) + 24;
+      let currentSection: SectionId = "home";
+
+      navItems.forEach(({ id }) => {
+        const section = document.getElementById(id);
+        if (section && section.offsetTop <= activationPoint) {
+          currentSection = id;
+        }
+      });
+
+      const pageBottom = window.scrollY + window.innerHeight;
+      if (pageBottom >= document.documentElement.scrollHeight - 2) {
+        currentSection = "contact";
+      }
+
+      setActiveSection((previous) => previous === currentSection ? previous : currentSection);
+      animationFrame = null;
+    };
+
+    const scheduleUpdate = () => {
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(updateActiveSection);
+      }
+    };
+
+    scheduleUpdate();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    window.addEventListener("hashchange", scheduleUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      window.removeEventListener("hashchange", scheduleUpdate);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
   const closeMenu = () => setMenuOpen(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -206,7 +277,7 @@ export default function Home() {
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") || "");
     const message = String(form.get("message") || "");
-    window.location.href = `mailto:hello@sakthi.dev?subject=${encodeURIComponent(
+    window.location.href = `mailto:Sakth.Sub@gmail.com?subject=${encodeURIComponent(
       `Portfolio enquiry from ${name}`,
     )}&body=${encodeURIComponent(message)}`;
   };
@@ -218,9 +289,30 @@ export default function Home() {
           Sakthivel<span>.</span>
         </a>
         <nav className={menuOpen ? "nav open" : "nav"} aria-label="Primary navigation">
-          {['Home', 'About', 'Projects', 'Skills', 'Writing', 'Contact'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} onClick={closeMenu}>{item}</a>
+          {navItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={activeSection === item.id ? "active" : undefined}
+              aria-current={activeSection === item.id ? "location" : undefined}
+              onClick={() => {
+                setActiveSection(item.id);
+                closeMenu();
+              }}
+            >
+              {item.label}
+            </a>
           ))}
+          <a
+            className="nav-hire"
+            href="#contact"
+            onClick={() => {
+              setActiveSection("contact");
+              closeMenu();
+            }}
+          >
+            Hire Me
+          </a>
         </nav>
         <div className="header-actions">
           <button className="icon-button theme-button" onClick={() => setLight(!light)} aria-label={`Switch to ${light ? 'dark' : 'light'} theme`}>
@@ -238,9 +330,9 @@ export default function Home() {
 
         <div className="social-rail" aria-label="Social links">
           <span className="rail-line" />
-          <a href="https://github.com/" aria-label="GitHub" target="_blank" rel="noreferrer"><Icon name="github" size={19} /></a>
-          <a href="https://www.linkedin.com/" aria-label="LinkedIn" target="_blank" rel="noreferrer"><Icon name="linkedin" size={18} /></a>
-          <a href="mailto:hello@sakthi.dev" aria-label="Email"><Icon name="mail" size={19} /></a>
+          <a href="https://github.com/s-sakthi-sub/portfolio" aria-label="GitHub" target="_blank" rel="noreferrer"><Icon name="github" size={19} /></a>
+          <a href="https://www.linkedin.com/in/sakthivel-subramaniyam-8b3b036a/" aria-label="LinkedIn" target="_blank" rel="noreferrer"><Icon name="linkedin" size={18} /></a>
+          <a href="mailto:Sakth.Sub@gmail.com" aria-label="Email"><Icon name="mail" size={19} /></a>
         </div>
 
         <div className="hero-content shell">
@@ -348,19 +440,33 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section writing-section" id="writing">
+      <section className="section clients-section" id="clients">
         <div className="shell">
-          <div className="section-heading-row compact">
+          <div className="section-heading-row">
             <div>
-              <div className="section-kicker">04 / Notes</div>
-              <h2 className="section-title">Things I&apos;m<br /><span>thinking about.</span></h2>
+              <div className="section-kicker">04 / Clients</div>
+              <h2 className="section-title">Clients I&apos;ve<br /><span>worked with.</span></h2>
             </div>
-            <a className="text-link" href="#contact">All notes <Icon name="arrow" size={18} /></a>
+            <p>Banking automation experience across markets, platforms, and enterprise application landscapes.</p>
           </div>
-          <div className="article-list">
-            <article><span>Engineering</span><h3>Good interfaces start with better questions</h3><time>6 min read</time><Icon name="arrowUp" /></article>
-            <article><span>Process</span><h3>Small systems, clear decisions, faster teams</h3><time>4 min read</time><Icon name="arrowUp" /></article>
-            <article><span>Frontend</span><h3>Designing motion that explains, not decorates</h3><time>7 min read</time><Icon name="arrowUp" /></article>
+          <div className="client-grid">
+            {clients.map((client) => (
+              <article className="client-card" key={client.name}>
+                <div className="client-card-top">
+                  <span>{client.number}</span>
+                  <span className="client-location">{client.location}</span>
+                </div>
+                <h3>{client.name}</h3>
+                <div className="client-applications">
+                  <span>Applications automated</span>
+                  <ul>
+                    {client.applications.map((application) => (
+                      <li key={application}>{application}</li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -372,7 +478,7 @@ export default function Home() {
             <div className="section-kicker">05 / Contact</div>
             <h2>Have a project<br />in mind? <span>Let&apos;s talk.</span></h2>
             <p>Tell me what you&apos;re building, where you&apos;re stuck, or just say hello. I&apos;ll get back to you soon.</p>
-            <a className="email-link" href="mailto:hello@sakthi.dev">hello@sakthi.dev <Icon name="arrowUp" /></a>
+            <a className="email-link" href="mailto:Sakth.Sub@gmail.com">Sakth.Sub@gmail.com <Icon name="arrowUp" /></a>
           </div>
           <form className="contact-form" onSubmit={handleSubmit}>
             <label>Name<input name="name" type="text" placeholder="Your name" required /></label>
@@ -388,8 +494,8 @@ export default function Home() {
           <a className="brand" href="#home">Sakthivel<span>.</span></a>
           <p>Designed &amp; built with care © {new Date().getFullYear()}</p>
           <div className="footer-links">
-            <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="https://github.com/s-sakthi-sub/portfolio" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/sakthivel-subramaniyam-8b3b036a/" target="_blank" rel="noreferrer">LinkedIn</a>
             <a href="#home" aria-label="Back to top"><Icon name="arrowUp" /></a>
           </div>
         </div>
