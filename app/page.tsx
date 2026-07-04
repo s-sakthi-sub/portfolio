@@ -343,7 +343,7 @@ export default function Home() {
             <p>I turn complex ideas into fast, accessible, and beautifully simple digital products.</p>
             <div className="hero-cta">
               <a className="button button-primary" href="#projects">Explore my work <Icon name="arrow" /></a>
-              <a className="button button-secondary" href="/sakthi-resume.txt" download>Download résumé <Icon name="download" /></a>
+              <a className="button button-secondary" href="/Sakthivel_Principal_Consultant.pdf" download="Sakthivel_Principal_Consultant.pdf">Download résumé <Icon name="download" /></a>
             </div>
           </div>
           <CodeWindow />

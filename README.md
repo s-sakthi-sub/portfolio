@@ -16,7 +16,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - Personal copy, projects, skills, links, and email: `app/page.tsx`
 - Colors, spacing, breakpoints, and visual styling: `app/globals.css`
 - Page title and description: `app/layout.tsx`
-- Replace `public/sakthi-resume.txt` with your résumé PDF, then update its link in `app/page.tsx`
+- Résumé download: `public/Sakthivel_Principal_Consultant.pdf`
 
 ## Production check
 
